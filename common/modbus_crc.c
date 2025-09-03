@@ -10,6 +10,8 @@
 #include "modbus_crc.h"
 
 
+#if 0
+
 /* Table of CRC values for high-order byte */
 static const uint8_t table_crc_hi[] = {
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0,
@@ -85,3 +87,47 @@ uint16_t crc16(uint8_t *buffer, uint16_t buffer_length)
 
     return (crc_hi << 8 | crc_lo);
 }
+
+#else
+
+/**
+ * Calculate the Modbus CRC-16 for a buffer of data.
+ *
+ * CRC-16 Parameters:
+ * - Polynomial: 0x8005 (x^16 + x^15 + x^2 + 1)
+ * - Initial value: 0xFFFF
+ * - Bit order: LSB first (least significant bit first)
+ * - Final XOR value: 0x0000 (no final XOR)
+ * - Input reflection: Yes (each byte is processed LSB first)
+ * - Output reflection: Yes (result is reflected)
+ *
+ * @param buffer Pointer to the data buffer
+ * @param buffer_length Number of bytes in the buffer
+ * @return The calculated CRC-16 value
+ */
+uint16_t crc16(uint8_t *buffer, uint16_t buffer_length)
+{
+    uint16_t crc = 0xFFFF; // Initial value
+    uint16_t polynomial = 0xA001; // Reflected polynomial (0x8005 reflected)
+
+    // Process each byte in the buffer
+    while (buffer_length--) {
+        crc ^= *buffer++; // XOR byte into least sig. byte of crc
+
+        // Process each bit
+        for (int i = 0; i < 8; i++) {
+            // If the LSB is 1, shift right and XOR with polynomial
+            if (crc & 0x0001) {
+                crc >>= 1;
+                crc ^= polynomial;
+            } else {
+                // Just shift right
+                crc >>= 1;
+            }
+        }
+    }
+
+    return crc;
+}
+
+#endif
