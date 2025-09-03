@@ -24,6 +24,7 @@ extern const char FW_Info_BuildDate[];
 extern const char FW_Info_Version[];
 extern const char FW_Info_Vendor[];
 extern const char FW_Info_Product[];
+extern const char FW_Info_Homepage[];
 
 #ifdef __cplusplus
 }

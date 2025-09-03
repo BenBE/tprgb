@@ -15,6 +15,7 @@ const fw_info_t FW_Info ATTR_BOOT = {
 
 /* Version constants for console output */
 const char FW_Info_Vendor[] ATTR_BOOT = "Toppoint e.V.";
+const char FW_Info_Homepage[] ATTR_BOOT = "https://toppoint.de/";
 const char FW_Info_Product[] ATTR_BOOT = "Bootloader";
 const char FW_Info_BuildDate[] ATTR_BOOT = "${BUILDDATE}";
 const char FW_Info_Version[] ATTR_BOOT = "${GITVERSION}";
