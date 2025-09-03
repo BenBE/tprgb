@@ -23,6 +23,8 @@ cubemx_target(
     TARGET app
     CUBEMX_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/app_stub"
     IOC "${CMAKE_CURRENT_LIST_DIR}/app_stub/app_stub.ioc"
+    STARTUP "${CMAKE_CURRENT_LIST_DIR}/app_stub/startup_stm32f030f4px.s"
+    LDSCRIPT "${CMAKE_CURRENT_LIST_DIR}/app_stub/custom_FLASH.ld"
     FLASH_TARGET_NAME flash_app
     IMG_ADDR 0x08002000
 )
@@ -55,6 +57,8 @@ cubemx_target(
     TARGET boot
     CUBEMX_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/boot_stub"
     IOC "${CMAKE_CURRENT_LIST_DIR}/boot_stub/boot_stub.ioc"
+    STARTUP "${CMAKE_CURRENT_LIST_DIR}/boot_stub/startup_stm32f030f4px.s"
+    LDSCRIPT "${CMAKE_CURRENT_LIST_DIR}/boot_stub/custom_FLASH.ld"
     FLASH_TARGET_NAME flash_boot
     IMG_ADDR 0x08000000
     ELF2BIN_OPT "--pad-to 0x8002000 --gap-fill 0xff"
