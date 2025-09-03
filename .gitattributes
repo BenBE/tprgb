@@ -1,0 +1,13 @@
+*	text=auto
+
+*.md	text
+*.txt	text
+
+*.c	text
+*.cpp	text
+*.h	text
+*.hpp	text
+*.in    text
+*.ioc	text
+*.ld	text
+*.s	text
