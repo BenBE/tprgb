@@ -1,3 +1,5 @@
+#include "modbus.h"
+
 /*
  * modbus.c
  *
@@ -5,9 +7,12 @@
  *      Author: W
  */
 
-#include <string.h>  // For memcpy
-#include "modbus.h"
+#include <string.h>
+
+#include "stm32f0xx_ll_usart.h"
+
 #include "modbus_crc.h"
+
 
 mb_packet request_packet;
 
@@ -71,9 +76,8 @@ void mb_packet_transmit(mb_packet *packet) {
 	}
 }
 
-void USART1_IRQHandler(void)
+void mb_handle_irq(void)
 {
-  /* USER CODE BEGIN USART1_IRQn 0 */
 	static bool is_first_byte = true; // workaround for always receiving an empty byte for now reason after reset
 	if (is_first_byte) {
 		is_first_byte = false;
@@ -90,9 +94,4 @@ void USART1_IRQHandler(void)
 			mb_can_evalueate_packet = true;
 		}
 	}
-
-  /* USER CODE END USART1_IRQn 0 */
-  /* USER CODE BEGIN USART1_IRQn 1 */
-
-  /* USER CODE END USART1_IRQn 1 */
 }

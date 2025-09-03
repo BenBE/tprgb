@@ -1,3 +1,4 @@
+#pragma once
 /*
  * modbus.h
  *
@@ -5,12 +6,8 @@
  *      Author: W
  */
 
-#ifndef INC_MODBUS_H_
-#define INC_MODBUS_H_
-
-#include "stdint.h"
-#include "stdbool.h"
-#include "stm32f0xx_ll_usart.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 
 /* Modbus configuration */
@@ -54,4 +51,4 @@ bool mb_crc_is_ok();
 mb_packet* mb_packet_eval();
 void mb_packet_transmit(mb_packet *packet);
 
-#endif /* INC_MODBUS_H_ */
+void mb_handle_irq(void);

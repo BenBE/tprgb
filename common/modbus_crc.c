@@ -7,8 +7,8 @@
  *      Copy from modbus reference manual
  */
 
+#include "modbus_crc.h"
 
-#include "stdint.h"
 
 /* Table of CRC values for high-order byte */
 static const uint8_t table_crc_hi[] = {
@@ -85,4 +85,3 @@ uint16_t crc16(uint8_t *buffer, uint16_t buffer_length)
 
     return (crc_hi << 8 | crc_lo);
 }
-
