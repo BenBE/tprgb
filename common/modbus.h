@@ -44,7 +44,7 @@ typedef struct {
 	uint8_t data_len;
 } mb_packet;
 
-extern bool mb_can_evalueate_packet;
+extern volatile bool mb_can_evalueate_packet;
 
 void mb_init();
 bool mb_crc_is_ok();
