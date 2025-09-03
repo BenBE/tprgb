@@ -1,0 +1,6 @@
+execute_process(COMMAND git --no-pager describe --dirty --always --tags --match=v* --abbrev=8 OUTPUT_VARIABLE GITVERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND date -u "+%F %T" OUTPUT_VARIABLE BUILDDATE OUTPUT_STRIP_TRAILING_WHITESPACE)
+configure_file(${INPUT_FILE} ${OUTPUT_FILE})
+message("git version info: ${GITVERSION}")
+execute_process(COMMAND bash -c "echo -n ${BUILDDATE} | tr -d :-| tr -s '[:space:]' _ > buildinfo")
+execute_process(COMMAND bash -c "echo -n '_${GITVERSION}' |tr -sc '[:alnum:]-' _ >> buildinfo")
