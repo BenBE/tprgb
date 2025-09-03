@@ -35,6 +35,16 @@
 #define MB_ADDR_HOLDING_REG_FINISH_FLASH 40007U
 #define MB_ADDR_HOLDING_REG_ABORT_FLASH 40008U
 
+#define MB_EX_ILLEGAL_FUNCTION 0x01
+#define MB_EX_ILLEGAL_DATA_ADDRESS 0x02
+#define MB_EX_ILLEGAL_DATA_VALUE 0x03
+#define MB_EX_DEVICE_FAILURE 0x04
+#define MB_EX_ACKNOWLEDGE 0x05
+#define MB_EX_DEVICE_BUSY 0x06
+#define MB_EX_MEMORY_PARITY_ERROR 0x08
+#define MB_EX_GATEWAY_PATH_UNAVAILABLE 0x0A
+#define MB_EX_GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND 0x0B
+
 
 /* Modbus packet */
 typedef struct {
@@ -52,3 +62,5 @@ mb_packet* mb_packet_eval();
 void mb_packet_transmit(mb_packet *packet);
 
 void mb_handle_irq(void);
+
+void mb_packet_handle_default(mb_packet *packet);
