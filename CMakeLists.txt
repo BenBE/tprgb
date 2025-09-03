@@ -50,13 +50,46 @@ add_custom_command(
         -P ${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen_version.cmake
 )
 
+add_executable(boot boot_version.c)
+cubemx_target(
+    TARGET boot
+    CUBEMX_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/boot_stub"
+    IOC "${CMAKE_CURRENT_LIST_DIR}/boot_stub/boot_stub.ioc"
+    FLASH_TARGET_NAME flash_boot
+    IMG_ADDR 0x08000000
+    ELF2BIN_OPT "--pad-to 0x8002000 --gap-fill 0xff"
+)
+target_compile_options(boot PRIVATE -Og -Wall -g -gdwarf-2)
+target_compile_definitions(boot PRIVATE STM32F030x6 USE_FULL_LL_DRIVER)
+target_include_directories(boot PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/boot"
+    "${CMAKE_CURRENT_LIST_DIR}/common"
+)
+file(GLOB_RECURSE BOOTLOADER_SOURCES
+    "${CMAKE_CURRENT_LIST_DIR}/boot/*.c"
+    "${CMAKE_CURRENT_LIST_DIR}/boot/*.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/common/*.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/*.cpp"
+)
+target_sources(boot PRIVATE ${BOOTLOADER_SOURCES})
+
+# Burn git commit hash to bootloader file
+add_custom_command(
+    OUTPUT boot_version.c _ # "_" is dummy output, so this command runs on every build
+    COMMAND ${CMAKE_COMMAND}
+        -D INPUT_FILE=${CMAKE_CURRENT_SOURCE_DIR}/boot/version.c.in
+        -D OUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/boot_version.c
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen_version.cmake
+)
+
 add_custom_command(
     OUTPUT tprgb.bin
     COMMAND
     cat
+    "$<TARGET_PROPERTY:boot,TARGET_FILE_BIN>"
     "$<TARGET_PROPERTY:app,TARGET_FILE_BIN>"
     > "tprgb.bin"
-    DEPENDS app
+    DEPENDS app boot
     COMMENT "Generating firmware bundle"
 )
 
@@ -68,9 +101,11 @@ option(GCC_DEBUG_BUILD "Enable debugging information for GCC" ON)
 
 if(GCC_DEBUG_BUILD)
     target_compile_options(app PRIVATE -Og -g -gdwarf-2)
+    target_compile_options(boot PRIVATE -Og -g -gdwarf-2)
     message(STATUS "GCC debug build     : enabled")
 else()
     target_compile_options(app PRIVATE -O3 -g)
+    target_compile_options(boot PRIVATE -O3 -g)
     message(STATUS "GCC debug build     : disabled")
 endif(GCC_DEBUG_BUILD)
 
@@ -101,6 +136,10 @@ add_custom_target(style
     "${CMAKE_SOURCE_DIR}/app_stub/Inc/*.h"
     "${CMAKE_SOURCE_DIR}/app/*.c"
     "${CMAKE_SOURCE_DIR}/app/*.h"
+    "${CMAKE_SOURCE_DIR}/boot_stub/Src/*.c"
+    "${CMAKE_SOURCE_DIR}/boot_stub/Inc/*.h"
+    "${CMAKE_SOURCE_DIR}/boot/*.c"
+    "${CMAKE_SOURCE_DIR}/boot/*.h"
     "${CMAKE_SOURCE_DIR}/common/*.c"
     "${CMAKE_SOURCE_DIR}/common/*.h"
 #    "${CMAKE_SOURCE_DIR}/app/*.cpp"
@@ -117,6 +156,10 @@ add_custom_target(style
     LC_ALL=C.utf-8 sort -o
     "${CMAKE_SOURCE_DIR}/app_stub/app_stub.ioc"
     "${CMAKE_SOURCE_DIR}/app_stub/app_stub.ioc"
+    COMMAND
+    LC_ALL=C.utf-8 sort -o
+    "${CMAKE_SOURCE_DIR}/boot_stub/boot_stub.ioc"
+    "${CMAKE_SOURCE_DIR}/boot_stub/boot_stub.ioc"
     COMMENT "Formatting code"
     VERBATIM
 )
@@ -125,7 +168,9 @@ add_custom_target(style
 add_custom_target(memusage
     COMMAND LC_ALL=C fpvgcc --ssec app.map | grep --color=none -P -- '-+-|TOTAL'
     COMMAND LC_ALL=C fpvgcc --sar app.map | grep --color=none -P -- '-+-|TOTAL'
-    DEPENDS app.elf
+    COMMAND LC_ALL=C fpvgcc --ssec boot.map | grep --color=none -P -- '-+-|TOTAL'
+    COMMAND LC_ALL=C fpvgcc --sar boot.map | grep --color=none -P -- '-+-|TOTAL'
+    DEPENDS app.elf boot.elf
     COMMENT "Print memory section usage information"
 )
 
